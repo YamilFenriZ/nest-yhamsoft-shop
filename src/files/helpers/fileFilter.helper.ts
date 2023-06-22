@@ -12,6 +12,8 @@ export const fileFilter = (
     const validExtensions = ['jpg', 'jpeg', 'png', 'gif'];
 
     if( validExtensions.includes(fileExtension) ){
+        console.log(fileExtension);
+        console.log(validExtensions);
         return callback(null, true);
     }
     callback(null, false);

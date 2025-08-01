@@ -35,9 +35,9 @@ import { MessagesWsModule } from './messages-ws/messages-ws.module';
       synchronize: true, // Solo en desarrollo
       logging: true,
     }),
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname,'..','public'),
-    }),
+    // ServeStaticModule.forRoot({
+    //  rootPath: join(__dirname,'..','public'),
+    // }),
     ProductsModule,
     CommonModule,
     SeedModule,

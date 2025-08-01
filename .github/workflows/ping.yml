@@ -2,23 +2,24 @@ name: Keep Alive - Render Ping
 
 on:
   schedule:
-    - cron: "*/3 * * * *"  # Corre cada 5 minutos (zona UTC)
-  workflow_dispatch:        # Permite correrlo manualmente
+    - cron: "*/10 * * * *"  # Corre cada 10 minutos (zona UTC)
+  workflow_dispatch:         # Permite correrlo manualmente
 
 jobs:
   ping_api:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Ejecutar ping a la API
+      - name: Ejecutar ping a la API Render
         run: |
           echo "🔄 Enviando ping a la API Render..."
-          response=$(curl --silent --write-out "%{http_code}" --output /dev/null \
-          --location --request GET "https://nest-yhamsoft-shop.onrender.com/api/products?limit=1" \
+          response=$(curl --fail --silent --show-error --write-out "%{http_code}" --output /dev/null \
+          --location "https://nest-yhamsoft-shop.onrender.com/api/products?limit=1" \
           --header "Content-Type: application/json")
 
           if [ "$response" -eq 200 ]; then
-            echo "✅ API respondio correctamente (200)"
+            echo "✅ API respondió correctamente (200)"
           else
             echo "⚠️ API devolvió código HTTP: $response"
+            exit 1
           fi

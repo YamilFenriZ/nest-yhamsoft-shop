@@ -7,11 +7,16 @@ import { PaginationDto } from 'src/common/dtos/pagination.dto';
 import { validate as isUUID } from 'uuid';
 import { Product, ProductImage } from './entities';
 import { User } from 'src/auth/entities/user.entity';
+import axios from 'axios';
 
 @Injectable()
 export class ProductsService {
-
   private readonly logger = new Logger('ProductsService');
+  private readonly supabaseConfig = {
+    baseUrl: process.env.SUPABASE_URL,
+    apiKey: process.env.SUPABASE_API_KEY,
+    tableName: process.env.SUPABASE_TABLE_NAME
+  };
 
   constructor(
     @InjectRepository(Product)
@@ -176,5 +181,48 @@ export class ProductsService {
     } catch (error) {
       this.handleDBExceptions(error);
     }
+  }
+
+  /**
+   * Fetches products from Supabase database
+   * @returns Promise<any> Array of products from Supabase
+   * @throws InternalServerErrorException if there's an error fetching the products
+   */
+  async getSupabaseProducts() {
+    try {
+      const response = await axios.get(
+        `${this.supabaseConfig.baseUrl}/${this.supabaseConfig.tableName}`,
+        {
+          headers: this.getSupabaseHeaders()
+        }
+      );
+      return response.data;
+    } catch (error) {
+      this.handleSupabaseError(error);
+    }
+  }
+
+  /**
+   * Returns the required headers for Supabase API requests
+   * @private
+   * @returns Object with the necessary headers
+   */
+  private getSupabaseHeaders() {
+    return {
+      'apikey': this.supabaseConfig.apiKey,
+      'Authorization': `Bearer ${this.supabaseConfig.apiKey}`,
+      'Content-Type': 'application/json'
+    };
+  }
+
+  /**
+   * Handles errors from Supabase API requests
+   * @private
+   * @param error - The error object from the failed request
+   * @throws InternalServerErrorException with a custom error message
+   */
+  private handleSupabaseError(error: any) {
+    this.logger.error('Error fetching Supabase products', error?.response?.data || error.message);
+    throw new InternalServerErrorException('Error fetching products from Supabase');
   }
 }

@@ -56,4 +56,11 @@ export class ProductsController {
   remove(@Param('id',ParseUUIDPipe) id: string) {
     return this.productsService.remove( id );
   }
+
+  @Get('supabase/all')
+  @ApiResponse({ status: 200, description: 'Products from Supabase retrieved successfully' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  getSupabaseProducts() {
+    return this.productsService.getSupabaseProducts();
+  }
 }

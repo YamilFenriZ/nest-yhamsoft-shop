@@ -225,4 +225,81 @@ export class ProductsService {
     this.logger.error('Error fetching Supabase products', error?.response?.data || error.message);
     throw new InternalServerErrorException('Error fetching products from Supabase');
   }
+
+  /**
+   * Fetches featured products from Supabase that are visible and highlighted
+   * @param limit Maximum number of products to return
+   * @returns Promise<any> Array of featured products from Supabase
+   * @throws InternalServerErrorException if there's an error fetching the products
+   */
+  async getSupabaseFeaturedProducts(limit: number = 3) {
+    try {
+      const queryParams = new URLSearchParams({
+        'select': '*',
+        'visible': 'eq.true',
+        'destacado': 'eq.true',
+        'limit': limit.toString()
+      });
+
+      const response = await axios.get(
+        `${this.supabaseConfig.baseUrl}/${this.supabaseConfig.tableName}?${queryParams}`,
+        {
+          headers: this.getSupabaseHeaders()
+        }
+      );
+      return response.data;
+    } catch (error) {
+      this.handleSupabaseError(error);
+    }
+  }
+
+  /**
+   * Fetches products from Supabase by category ID
+   * @param categoryId The category ID to filter products
+   * @returns Promise<any> Array of products from Supabase filtered by category
+   * @throws InternalServerErrorException if there's an error fetching the products
+   */
+  async getSupabaseProductsByCategory(categoryId: string) {
+    try {
+      const queryParams = new URLSearchParams({
+        'select': '*',
+        'visible': 'eq.true',
+        'categoria_id': `eq.${categoryId}`
+      });
+
+      const response = await axios.get(
+        `${this.supabaseConfig.baseUrl}/${this.supabaseConfig.tableName}?${queryParams}`,
+        {
+          headers: this.getSupabaseHeaders()
+        }
+      );
+      return response.data;
+    } catch (error) {
+      this.handleSupabaseError(error);
+    }
+  }
+
+  /**
+   * Fetches categories from Supabase ordered by name
+   * @returns Promise<any> Array of categories from Supabase
+   * @throws InternalServerErrorException if there's an error fetching the categories
+   */
+  async getSupabaseCategories() {
+    try {
+      const queryParams = new URLSearchParams({
+        'select': '*',
+        'order': 'nombre.asc'
+      });
+
+      const response = await axios.get(
+        `${this.supabaseConfig.baseUrl}/categorias?${queryParams}`,
+        {
+          headers: this.getSupabaseHeaders()
+        }
+      );
+      return response.data;
+    } catch (error) {
+      this.handleSupabaseError(error);
+    }
+  }
 }

@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, Query } from '@nestjs/common';
-import { ApiBasicAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBasicAuth, ApiQuery, ApiResponse, ApiTags, ApiParam } from '@nestjs/swagger';
 
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -62,5 +62,33 @@ export class ProductsController {
   @ApiResponse({ status: 500, description: 'Internal server error' })
   getSupabaseProducts() {
     return this.productsService.getSupabaseProducts();
+  }
+
+  @Get('supabase/featured')
+  @ApiResponse({ status: 200, description: 'Featured products retrieved successfully' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Maximum number of products to return' })
+  getSupabaseFeaturedProducts(@Query('limit') limit?: number) {
+    return this.productsService.getSupabaseFeaturedProducts(limit);
+  }
+
+  @Get('supabase/category/:categoryId')
+  @ApiResponse({ status: 200, description: 'Products by category retrieved successfully' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @ApiParam({ 
+    name: 'categoryId', 
+    required: true, 
+    description: 'Category ID to filter products',
+    type: String 
+  })
+  getSupabaseProductsByCategory(@Param('categoryId') categoryId: string) {
+    return this.productsService.getSupabaseProductsByCategory(categoryId);
+  }
+
+  @Get('supabase/categories')
+  @ApiResponse({ status: 200, description: 'Categories retrieved successfully' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  getSupabaseCategories() {
+    return this.productsService.getSupabaseCategories();
   }
 }

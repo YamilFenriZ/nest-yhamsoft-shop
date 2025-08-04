@@ -6,8 +6,21 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const logger = new Logger('Boostrap');
+  const logger = new Logger('Bootstrap');
 
+  // Configuración CORS basada en ambiente
+  const allowedOrigins = process.env.CORS_ALLOWED_ORIGINS?.split(',') || [];
+  
+  app.enableCors({
+    origin: process.env.NODE_ENV === 'development' 
+      ? true 
+      : allowedOrigins,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+    credentials: true,
+    maxAge: 3600,
+  });
+  
   app.setGlobalPrefix('api');
 
   app.useGlobalPipes(
